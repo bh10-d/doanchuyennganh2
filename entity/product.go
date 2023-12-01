@@ -2,6 +2,8 @@ package entity
 
 import (
 	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"os"
 )
 
@@ -13,6 +15,9 @@ type Product struct {
 	IsAvailable bool    `json:"isAvailable"`
 }
 
+// ErrNoProduct is used if no product found
+var ErrNoProduct = errors.New("no product found")
+
 func GetProducts() ([]byte, error) {
 	// Read JSON file
 	data, err := os.ReadFile("../entity/data.json")
@@ -20,6 +25,30 @@ func GetProducts() ([]byte, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+// GetProduct takes id as input and returns the corresponding product, else it returns ErrNoProduct error.
+func GetProduct(id string) (Product, error) {
+	// Read JSON file
+	data, err := ioutil.ReadFile("../entity/data.json")
+	if err != nil {
+		return Product{}, err
+	}
+	// read products
+	var products []Product
+	err = json.Unmarshal(data, &products)
+	if err != nil {
+		return Product{}, err
+	}
+	// iterate through product array
+	for i := 0; i < len(products); i++ {
+		// if we find one product with the given ID
+		if products[i].ID == id {
+			// return product
+			return products[i], nil
+		}
+	}
+	return Product{}, ErrNoProduct
 }
 
 func AddProduct(product Product) error {
@@ -48,4 +77,44 @@ func AddProduct(product Product) error {
 	}
 
 	return nil
+}
+
+// DeleteProduct takes id as input and deletes the corresponding product, else it returns ErrNoProduct error.
+func DeleteProduct(id string) error {
+	// Read JSON file
+	data, err := ioutil.ReadFile("../entity/data.json")
+	if err != nil {
+		return err
+	}
+	// read products
+	var products []Product
+	err = json.Unmarshal(data, &products)
+	if err != nil {
+		return err
+	}
+	// iterate through product array
+	for i := 0; i < len(products); i++ {
+		// if we find one product with the given ID
+		if products[i].ID == id {
+			products = removeElement(products, i)
+			// Write Updated JSON file
+			updatedData, err := json.Marshal(products)
+			if err != nil {
+				return err
+			}
+			err = ioutil.WriteFile("../entity/data.json", updatedData, os.ModePerm)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+	return ErrNoProduct
+}
+
+// removeElement is used to remove element from product array at given index
+func removeElement(arr []Product, index int) []Product {
+	ret := make([]Product, 0)
+	ret = append(ret, arr[:index]...)
+	return append(ret, arr[index+1:]...)
 }

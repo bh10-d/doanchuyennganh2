@@ -2,27 +2,43 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"todolist/handlers"
+	"log"
+	"todolist/entity"
 
-	// "github.com/HelloWorld/goProductAPI/handlers"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
+// "github.com/HelloWorld/goProductAPI/handlers"
+
 func main() {
-	// Create new Router
-	router := mux.NewRouter()
-
-	// route properly to respective handlers
-	router.Handle("/products", handlers.GetProductsHandler()).Methods("GET")
-	router.Handle("/products", handlers.CreateProductHandler()).Methods("POST")
-
-	// Create new server and assign the router
-	server := http.Server{
-		Addr:    ":9090",
-		Handler: router,
+	//gorm will work with database while gin work with route
+	//dsn is Data Source Name Configuration
+	// 	mysql.Open(dsn): Creates a MySQL database connection using the provided DSN
+	// &gorm.Config{}: An optional configuration object for GORM, the ORM (Object-Relational Mapping) library
+	dsn := "root@tcp(127.0.0.1:3306)/dacn2?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// gorm.Open wull return 2 value
+	// the first vallue is pointer to a *gorm.DB established database connection
+	// the second value will return the err if cannot connect to db
+	if err != nil {
+		log.Fatalln("Cannot connect to MySQL:", err)
 	}
-	fmt.Println("Staring Product Catalog server on Port 9090")
-	// Start Server on defined port/host.
-	server.ListenAndServe()
+
+	log.Println("Connected to MySQL:", db)
+
+	router := gin.Default()
+	v1 := router.Group("/v1")
+	{
+		v1.POST("/items", entity.CreateItem(db))    // create item
+		v1.GET("/items", entity.GetListOfItems(db)) // list items
+		// v1.GET("/items/:id", readItemById(db))      // get an item by ID
+		// v1.PUT("/items/:id", editItemById(db))      // edit an item by ID
+		// v1.DELETE("/items/:id", deleteItemById(db)) // delete an item by ID
+	}
+
+	router.Run() // default port is 8080 and if i custom the port i will change follow format router.Run(":<Port>")
+
+	fmt.Print("Main run")
 }
