@@ -1,0 +1,60 @@
+# # cat docker-compose.yml
+# version: '3.8'
+# services:
+# ### MySQL Container
+#   mysql:
+#     build:
+#       args:
+#         - MYSQL_DATABASE=dacn2
+#         - MYSQL_ROOT_PASSWORD=root
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#     - ./dump:/docker-entrypoint-initdb.d
+
+
+
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    # them vao
+    container_name: db_dacn2
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    # end them vao
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=dacn2
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+      - ./data.sql:/docker-entrypoint-initdb.d/data.sql
+    networks:
+      - dacn2
+
+  api:
+    container_name: api_go_dacn2
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "db"
+    networks:
+      - dacn2
+
+
+volumes:
+  db:
+    driver: local
+networks:
+  dacn2:
+    driver: "bridge"

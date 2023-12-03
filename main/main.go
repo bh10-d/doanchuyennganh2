@@ -17,7 +17,7 @@ func main() {
 	//dsn is Data Source Name Configuration
 	// 	mysql.Open(dsn): Creates a MySQL database connection using the provided DSN
 	// &gorm.Config{}: An optional configuration object for GORM, the ORM (Object-Relational Mapping) library
-	dsn := "root@tcp(127.0.0.1:3306)/dacn2?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:root@tcp(docker.for.mac.localhost:3306)/dacn2?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	// gorm.Open wull return 2 value
 	// the first vallue is pointer to a *gorm.DB established database connection
@@ -27,6 +27,9 @@ func main() {
 	}
 
 	log.Println("Connected to MySQL:", db)
+
+	// example i have a path: v1/items or v1/product
+	// and i using golang to get the path and redirect request to server own this function
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
