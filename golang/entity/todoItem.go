@@ -1,7 +1,9 @@
 package entity
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,6 +20,10 @@ type ToDoItem struct {
 	CreatedAt *time.Time `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt *time.Time `json:"updated_at" gorm:"column:updated_at"`
 }
+
+var HOST_NODE_SERVER = "172.26.0.4"
+
+// var HOST_NODE_SERVER = "localhost"
 
 // Define func TableName belong to TodoItem struct
 func (ToDoItem) TableName() string { return "todo_items" }
@@ -155,5 +161,88 @@ func DeleteItemById(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"data": true})
+	}
+}
+
+func GetData() gin.HandlerFunc {
+	// HOST_NODE_SERVER := "172.26.0.4"
+	return func(c *gin.Context) {
+		// data := "buiduchieu do an chuyen nganh 2"
+		// c.JSON(http.StatusOK, gin.H{"data": data})
+		fmt.Print("buiduchieu da o day\n")
+		API := "http://" + HOST_NODE_SERVER + ":9090/api/test"
+		// Make an HTTP GET request to the Node.js API
+		resp, err := http.Get(API)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		defer resp.Body.Close()
+
+		// Read the response body
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Parse the JSON response body
+		var data interface{}
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Send the parsed data as JSON response
+		c.JSON(http.StatusOK, gin.H{"data": data})
+	}
+}
+
+func DeleteData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// fmt.Println("This function is working")
+		// fmt.Println(c.Param("id"))
+		// c.JSON(http.StatusOK, gin.H{"data": c.Param("id")})
+		API := "http://" + HOST_NODE_SERVER + ":9090/api/test/" + c.Param("id")
+		fmt.Println(API)
+		// Create a new HTTP request object
+		req, err := http.NewRequest("DELETE", API, nil)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+
+		// Send the DELETE request
+		client := http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Parse the JSON response body
+		var data interface{}
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Check the response status code
+		if resp.StatusCode != http.StatusOK {
+			fmt.Println("Error:", resp.StatusCode)
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"data": data})
+		// Print a success message
+		// fmt.Println("Data deleted successfully")
 	}
 }

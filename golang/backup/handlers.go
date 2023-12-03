@@ -73,3 +73,11 @@
 // 		rw.Write([]byte("Added New Product"))
 // 	}
 // }
+
+package backup
+
+import "fmt"
+
+func fun1() {
+	fmt.Println("func1")
+}

@@ -1,8 +1,8 @@
 FROM golang:latest as builder
 
-WORKDIR /go-microservice/
+WORKDIR /go-microservice
 
-COPY . .
+COPY ./golang .
 
 RUN CGO_ENABLED=0 go build -o microservice /go-microservice/main/main.go
 

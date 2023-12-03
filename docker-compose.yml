@@ -36,20 +36,36 @@ services:
       - db:/var/lib/mysql
       - ./data.sql:/docker-entrypoint-initdb.d/data.sql
     networks:
-      - dacn2
+      dacn2:
+        ipv4_address: 172.26.0.2
 
-  api:
+  api_go:
     container_name: api_go_dacn2
     build:
       context: .
-      dockerfile: api.Dockerfile
+      dockerfile: api_go.Dockerfile
     restart: on-failure
     ports:
       - "8080:8080"
+    networks:
+      dacn2:
+        ipv4_address: 172.26.0.3
     depends_on:
       - "db"
+  
+  api_node:
+    container_name: api_node_dacn2
+    build:
+      context: .
+      dockerfile: api_node.Dockerfile
+    restart: on-failure
+    ports:
+      - 9090:9090
     networks:
-      - dacn2
+      dacn2:
+        ipv4_address: 172.26.0.4
+    depends_on:
+      - "db"
 
 
 volumes:
@@ -57,4 +73,8 @@ volumes:
     driver: local
 networks:
   dacn2:
-    driver: "bridge"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.26.0.0/16
+    external: true

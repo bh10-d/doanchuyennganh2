@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"todolist/entity"
+	"golang/entity"
 
 	"github.com/gorilla/mux"
 	// "github.com/HelloWorld/goProductAPI/entity"
