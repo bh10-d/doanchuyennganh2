@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"golang/entity"
 	"log"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -30,10 +32,23 @@ func main() {
 
 	log.Println("Connected to MySQL:", db)
 
+	router := gin.Default()
+
+	//Config
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS", "DELETE"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
+	config.ExposeHeaders = []string{"Content-Length"}
+	config.AllowCredentials = true
+	config.MaxAge = 12 * time.Hour
+
+	router.Use(cors.New(config))
+
 	// example i have a path: v1/items or v1/product
 	// and i using golang to get the path and redirect request to server own this function
 
-	router := gin.Default()
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/items", entity.CreateItem(db)) // create item

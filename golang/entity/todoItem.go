@@ -55,7 +55,7 @@ func CreateItem(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"data": dataItem.Id})
+		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	}
 }
 
