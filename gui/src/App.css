@@ -8,7 +8,7 @@
 }
 
 body {
-  background: #8758ff;
+  background: #031131;/*#8758ff*/
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,7 +70,7 @@ h1 {
   margin-bottom: 1rem;
 }
 
-.fa-trash {
+.fa-check {
   margin-left: 0.75rem;
 }
 
@@ -85,8 +85,21 @@ h1 {
   cursor: pointer;
 }
 
+.edit-icon{
+  padding-left: 15px;
+}
+
+.delete-icon:hover{
+  color: rgb(211, 45, 45);
+}
+
+.edit-icon:hover{
+  color: rgb(217, 219, 52);
+}
+
 .edit-icon,
 .delete-icon {
   cursor: pointer;
+  font-size: 20px;
 }
  

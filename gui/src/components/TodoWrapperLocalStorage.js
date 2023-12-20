@@ -8,14 +8,14 @@ uuidv4();
 export const TodoWrapperLocalStorage = () => {
     const [todos, setTodos] = useState([])
 
-    const BASE_URL = 'http://localhost:9090/v1/items'
+    // const BASE_URL = 'http://localhost:9090/v1/items'
 
-    useEffect(() => {
-        const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
-        setTodos(savedTodos);
+    // useEffect(() => {
+    //     const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+    //     setTodos(savedTodos);
         
 
-    }, []);
+    // }, []);
 
     const addTodo = todo => {
         const newTodos = [...todos, {id: uuidv4(), task: todo, completed: false, isEditing: false}];
